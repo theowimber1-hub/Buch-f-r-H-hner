@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#56704A">
+<meta name="color-scheme" content="light">
+<title>Hühnerbuch</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root {
+    --paper: #F5EFE2;
+    --card: #FFFCF6;
+    --ink: #2F2A20;
+    --ink2: #6B6152;
+    --muted: #978C78;
+    --line: #E6DCC8;
+    --moss: #56704A;
+    --moss-d: #3F5536;
+    --moss-l: #E3EAD9;
+    --straw: #E2C57F;
+    --brown: #A0683F;
+    --comb: #B8392B;
+    --serif: "Noto Serif", Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --radius: 18px;
+    --nav-h: 64px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 500px at 110% -10%, #EADFC6 0%, transparent 60%),
+      radial-gradient(900px 400px at -20% 30%, #EFE7D3 0%, transparent 55%),
+      var(--paper);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.4;
+    padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
+  }
+  button { font: inherit; color: inherit; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 0 16px; }
+
+  /* Header */
+  header.top {
+    padding: calc(env(safe-area-inset-top) + 14px) 0 0;
+    position: relative;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand svg { width: 58px; height: 50px; flex: none; }
+  .brand h1 { font-family: var(--serif); font-weight: 700; font-size: 24px; margin: 0; letter-spacing: .2px; }
+  .brand .sub { color: var(--ink2); font-size: 14px; margin-top: 1px; }
+  .meadow { display: block; width: 100%; height: 22px; margin-top: 6px; }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 1px 0 rgba(90,70,30,.04), 0 6px 18px -12px rgba(90,70,30,.25);
+  }
+  h2.sec { font-family: var(--serif); font-size: 18px; font-weight: 700; margin: 0 0 10px; }
+  .hint { color: var(--muted); font-size: 13px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .spacer { flex: 1; }
+
+  /* Day navigation */
+  .daynav { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .daynav .lbl { flex: 1; text-align: center; }
+  .daynav .lbl b { display: block; font-family: var(--serif); font-size: 19px; }
+  .daynav .lbl span { color: var(--ink2); font-size: 14px; }
+  .iconbtn {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 1px solid var(--line); background: var(--card);
+    display: grid; place-items: center; font-size: 22px; cursor: pointer;
+  }
+  .iconbtn:disabled { opacity: .3; }
+  .todaylink { border: 0; background: none; color: var(--moss); font-weight: 600; font-size: 14px; padding: 2px 6px; cursor: pointer; }
+
+  /* Hero number */
+  .hero { display: flex; align-items: center; gap: 16px; }
+  .hero .num { font-family: var(--serif); font-size: 64px; line-height: 1; font-weight: 700; min-width: 64px; text-align: center; }
+  .hero .what { font-family: var(--serif); font-size: 20px; }
+  .hero .meta { color: var(--ink2); font-size: 14px; margin-top: 2px; }
+  .nest { width: 92px; height: 62px; flex: none; margin-left: auto; }
+
+  /* Counters */
+  .counter { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+  .counter + .counter { border-top: 1px dashed var(--line); }
+  .counter .egg { width: 26px; height: 33px; flex: none; }
+  .counter .name { flex: 1; font-size: 17px; }
+  .counter .name small { display: block; color: var(--muted); font-size: 12px; }
+  .stepper { display: flex; align-items: center; gap: 4px; }
+  .stepper button {
+    width: 48px; height: 48px; border-radius: 14px; border: 1px solid var(--line);
+    background: #FBF7EE; font-size: 26px; line-height: 1; cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .stepper button.plus { background: var(--moss); color: #fff; border-color: var(--moss-d); }
+  .stepper button:active { transform: scale(.94); }
+  .stepper button:disabled { opacity: .35; }
+  .stepper .val { min-width: 40px; text-align: center; font-family: var(--serif); font-size: 24px; font-weight: 700; }
+
+  textarea, input[type=text] {
+    width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #FBF7EE;
+    padding: 10px 12px; font: inherit; color: inherit; resize: vertical;
+  }
+  textarea { min-height: 64px; }
+  textarea:focus, input:focus { outline: 2px solid var(--moss); outline-offset: 1px; }
+  .saved { color: var(--moss); font-size: 13px; opacity: 0; transition: opacity .3s; }
+  .saved.on { opacity: 1; }
+
+  /* Charts */
+  .chart { width: 100%; height: auto; display: block; touch-action: manipulation; }
+  .chart text { font-family: var(--sans); }
+  .readout { min-height: 22px; color: var(--ink2); font-size: 14px; margin-bottom: 6px; }
+  .readout b { color: var(--ink); }
+
+  /* Stat tiles */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tile { background: #FBF7EE; border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+  .tile .v { font-family: var(--serif); font-size: 28px; font-weight: 700; line-height: 1.1; }
+  .tile .k { color: var(--ink2); font-size: 13px; margin-top: 2px; }
+
+  /* Calendar */
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .cal .wd { text-align: center; color: var(--muted); font-size: 12px; padding-bottom: 2px; }
+  .cal .d {
+    aspect-ratio: 1 / 1.1; border-radius: 10px; border: 1px solid var(--line);
+    background: #FBF7EE; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; cursor: pointer; padding: 0;
+  }
+  .cal .d .n { font-size: 11px; color: var(--ink2); position: absolute; top: 3px; left: 5px; }
+  .cal .d .c { font-family: var(--serif); font-weight: 700; font-size: 17px; margin-top: 8px; }
+  .cal .d.dark .n, .cal .d.dark .c { color: #fff; }
+  .cal .d.today { outline: 2px solid var(--moss); outline-offset: 1px; }
+  .cal .d.future { opacity: .35; cursor: default; }
+  .cal .d .dot { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--moss); }
+  .cal .d.dark .dot { background: #fff; }
+  .cal .blank { visibility: hidden; }
+  .legend { display: flex; align-items: center; gap: 4px; justify-content: center; margin-top: 12px; color: var(--muted); font-size: 12px; flex-wrap: wrap; }
+  .legend i { width: 18px; height: 14px; border-radius: 4px; display: inline-block; border: 1px solid rgba(80,60,30,.15); }
+  .monthnav { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .monthnav b { flex: 1; text-align: center; font-family: var(--serif); font-size: 19px; }
+
+  /* Color distribution */
+  .stack { display: flex; gap: 2px; height: 22px; border-radius: 6px; overflow: hidden; margin: 6px 0 12px; }
+  .stack span { display: block; height: 100%; box-shadow: inset 0 0 0 1px rgba(80,60,30,.18); }
+  .colrow { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 15px; }
+  .colrow .egg { width: 18px; height: 23px; flex: none; }
+  .colrow .nm { flex: 1; }
+  .colrow .ct { color: var(--ink2); font-variant-numeric: tabular-nums; }
+
+  /* Notes list */
+  .notes .nt { padding: 8px 0; border-top: 1px dashed var(--line); font-size: 15px; cursor: pointer; }
+  .notes .nt:first-of-type { border-top: 0; }
+  .notes .nt small { color: var(--muted); display: block; font-size: 12px; }
+
+  /* Buttons */
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+    padding: 13px 16px; border-radius: 14px; border: 1px solid var(--line);
+    background: #FBF7EE; font-weight: 600; cursor: pointer; margin-top: 8px;
+  }
+  .btn.primary { background: var(--moss); color: #fff; border-color: var(--moss-d); }
+  .btn.danger { color: var(--comb); }
+  .banner {
+    display: flex; gap: 10px; align-items: center; background: #FFF3D6; border: 1px solid #EAD29A;
+    border-radius: 14px; padding: 10px 12px; margin: 12px 0; font-size: 14px; cursor: pointer;
+  }
+
+  /* Bottom nav */
+  nav.tabs {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+    background: rgba(255,252,246,.96); backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  nav.tabs .in { max-width: 520px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); height: var(--nav-h); }
+  nav.tabs button {
+    border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; font-size: 12px; color: var(--muted); cursor: pointer;
+  }
+  nav.tabs svg { width: 24px; height: 24px; }
+  nav.tabs button.on { color: var(--moss-d); font-weight: 700; }
+  nav.tabs button.on svg { stroke: var(--moss-d); }
+
+  /* Brut */
+  .banner.brood { background: var(--moss-l); border-color: #C5D3B5; }
+  .banner.brood.now { background: #FFF3D6; border-color: #EAD29A; }
+  .brood + .brood { border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 14px; }
+  .brood .title { display: flex; align-items: baseline; gap: 8px; }
+  .brood .title b { font-family: var(--serif); font-size: 18px; }
+  .progress { position: relative; height: 12px; border-radius: 6px; background: #EFE7D6; margin: 10px 0 4px; overflow: hidden; }
+  .progress > span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--moss); border-radius: 6px; }
+  .progress > i { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--card); }
+  .miles { list-style: none; padding: 0; margin: 10px 0 4px; font-size: 14px; }
+  .miles li { display: flex; gap: 8px; padding: 3px 0; color: var(--ink2); }
+  .miles li .ck { width: 18px; text-align: center; flex: none; }
+  .miles li.done { color: var(--muted); }
+  .miles li.today { color: var(--ink); font-weight: 700; }
+  .btnrow { display: flex; gap: 8px; }
+  .btnrow .btn { flex: 1; }
+  .btn.small { padding: 9px 12px; font-size: 14px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  input[type=date], input[type=number] {
+    width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #FBF7EE;
+    padding: 10px 12px; font: inherit; color: inherit; min-height: 46px;
+  }
+  .past { font-size: 14px; padding: 6px 0; border-top: 1px dashed var(--line); display: flex; gap: 8px; align-items: center; }
+  .past span { flex: 1; }
+  .linkbtn { border: 0; background: none; color: var(--muted); font-size: 13px; padding: 4px; cursor: pointer; text-decoration: underline; }
+
+  /* Welcome */
+  .overlay {
+    position: fixed; inset: 0; z-index: 50; background: var(--paper);
+    display: flex; align-items: center; justify-content: center; padding: 24px; overflow: auto;
+  }
+  .welcome { max-width: 420px; text-align: center; }
+  .welcome svg.hen { width: 180px; height: 150px; }
+  .welcome h1 { font-family: var(--serif); font-size: 28px; margin: 8px 0 6px; }
+  .welcome p { color: var(--ink2); margin: 0 0 18px; }
+  .welcome .stepper { justify-content: center; margin: 10px 0 18px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 14px);
+    transform: translateX(-50%) translateY(20px); opacity: 0; transition: all .25s;
+    background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 14px; z-index: 60;
+    pointer-events: none; max-width: 90vw; text-align: center;
+  }
+  .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .empty { text-align: center; color: var(--ink2); padding: 18px 8px; }
+  label.f { display: block; font-weight: 600; margin: 4px 0 6px; }
+  hr.soft { border: 0; border-top: 1px dashed var(--line); margin: 14px 0; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 120 100" aria-hidden="true"><use href="#hen"/></svg>
+      <div>
+        <h1 id="stallName">Hühnerbuch</h1>
+        <div class="sub" id="stallSub">Sundheimer</div>
+      </div>
+    </div>
+  </div>
+  <svg class="meadow" viewBox="0 0 400 22" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 14 C60 6 110 18 170 11 C230 4 290 16 340 9 C370 6 390 9 400 8 L400 22 L0 22 Z" fill="#DCE5CF"/>
+    <path d="M0 18 C70 12 130 21 200 15 C270 10 330 19 400 14 L400 22 L0 22 Z" fill="#C9D7B8"/>
+  </svg>
+</header>
+
+<main class="wrap" id="view"></main>
+
+<nav class="tabs" aria-label="Bereiche">
+  <div class="in">
+    <button data-tab="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3c-4 0-7 6.5-7 11a7 7 0 0 0 14 0c0-4.5-3-11-7-11z"/></svg>Eintragen</button>
+    <button data-tab="kalender"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Kalender</button>
+    <button data-tab="statistik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V12M10 20V6M15 20v-9M20 20V9"/></svg>Statistik</button>
+    <button data-tab="stall"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg>Stall</button>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+
+<!-- Sundheimer-Henne: weiß, schwarz gestreifter Halsbehang, schwarzer Schwanz, roter Kamm -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="hen">
+      <ellipse cx="62" cy="93" rx="40" ry="4" fill="#B9A986" opacity=".35"/>
+      <!-- Schwanz -->
+      <path d="M84 50 C86 34 92 20 106 12 C110 26 109 42 100 56 Z" fill="#2B2722"/>
+      <path d="M90 52 C96 40 104 32 114 30 C114 44 108 56 98 62 Z" fill="#3A342D"/>
+      <path d="M98 22 C102 30 103 40 99 50" stroke="#58504A" stroke-width="1.2" fill="none"/>
+      <!-- Beine -->
+      <g stroke="#D8B9A0" stroke-width="3" stroke-linecap="round" fill="none">
+        <path d="M54 76 L52 89 M52 89 L45 91 M52 89 L57 91"/>
+        <path d="M68 76 L69 89 M69 89 L63 91 M69 89 L75 91"/>
+      </g>
+      <!-- Körper -->
+      <path d="M28 52 C28 38 42 34 56 36 C70 38 84 40 96 36 C102 50 99 66 86 74 C74 82 48 84 37 76 C29 70 28 60 28 52 Z" fill="#FBF9F4" stroke="#D9D0BF" stroke-width="1"/>
+      <!-- Flügel mit schwarzen Spitzen -->
+      <path d="M48 56 C58 49 76 50 86 58 C80 68 64 71 52 65 Z" fill="#F1EDE4" stroke="#D3C9B6" stroke-width="1"/>
+      <path d="M74 62 C79 63 83 61 86 58 C83 66 78 68 72 68 Z" fill="#2E2A25"/>
+      <path d="M56 59 C64 56 72 57 79 60" stroke="#D3C9B6" fill="none"/>
+      <!-- Halsbehang (columbia) -->
+      <path d="M21 30 C19 42 24 54 34 60 C43 58 50 49 51 40 C45 31 35 22 28 22 Z" fill="#FBF9F4" stroke="#D9D0BF" stroke-width="1"/>
+      <g stroke="#2B2722" stroke-width="1.8" stroke-linecap="round" fill="none">
+        <path d="M26 36 C27 43 30 49 34 54"/>
+        <path d="M31 34 C32 41 35 47 39 52"/>
+        <path d="M36 33 C37 39 40 45 44 49"/>
+        <path d="M41 34 C42 38 44 42 47 45"/>
+        <path d="M22 37 C23 42 25 47 28 51"/>
+      </g>
+      <!-- Kopf -->
+      <circle cx="29" cy="25" r="9" fill="#FBF9F4" stroke="#D9D0BF" stroke-width="1"/>
+      <path d="M22 18 C22 12 26 12 27 16 C27 10 32 10 32 15 C33 10 38 11 37 17 C39 16 40 19 37 20 L23 20 Z" fill="#C2402F"/>
+      <path d="M21 30 C20 37 26 39 26 32 Z" fill="#C2402F"/>
+      <path d="M21 23.5 L13 27 L21 29 Z" fill="#D9A441"/>
+      <circle cx="26" cy="24" r="2.1" fill="#C9762B"/>
+      <circle cx="26" cy="24" r="1" fill="#1F1B16"/>
+    </g>
+  </defs>
+</svg>
+
+<script>
+"use strict";
+/* =========================================================
+   Hühnerbuch – Eier-Tagebuch für Sundheimer
+   Alle Daten liegen nur auf diesem Gerät (localStorage).
+   ========================================================= */
+
+// Begrüßung beim ersten Start – hier anpassbar:
+const GREETING_TITLE = "Alles Gute zum Geburtstag, Papa!";
+const GREETING_TEXT  = "Ab heute kannst du hier festhalten, wie fleißig deine Sundheimer legen – direkt am Handy, ganz ohne Internet.";
+
+const STORE_KEY = "huehnerbuch.v1";
+const COLORS = [
+  { id: "creme",     name: "Cremefarben", hex: "#F0DFBE" },
+  { id: "hellbraun", name: "Hellbraun",   hex: "#D9A86F", typical: true },
+  { id: "braun",     name: "Braun",       hex: "#B47A4A" },
+  { id: "dunkel",    name: "Dunkelbraun", hex: "#7E4C2A" },
+  { id: "gruen",     name: "Grün",        hex: "#A9BA8C" },
+];
+// Ein Farbton von hell nach dunkel – Legeleistung im Kalender
+const RAMP = ["#F6E7C6", "#EACB95", "#D7A76A", "#B57A46", "#7E4C2A"];
+const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const MONTHS_S = ["J","F","M","A","M","J","J","A","S","O","N","D"];
+const WD_S = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+
+/* ---------- Datum ---------- */
+const pad = n => String(n).padStart(2, "0");
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseKey = k => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (k, n) => { const d = parseKey(k); d.setDate(d.getDate() + n); return keyOf(d); };
+const todayKey = () => keyOf(new Date());
+const fmtLong = k => parseKey(k).toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+const fmtShort = k => parseKey(k).toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "short" });
+const fmtNum = (n, d = 0) => n.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d });
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* ---------- Speicher ---------- */
+function blank() {
+  return { v: 1, settings: { name: "Hühnerbuch", welcomed: false, lastBackup: null },
+           hens: [{ from: todayKey(), n: 6 }], days: {}, broods: [] };
+}
+function normalize(s) { if (!Array.isArray(s.broods)) s.broods = []; return s; }
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return blank();
+    const s = JSON.parse(raw);
+    return valid(s) ? normalize(s) : blank();
+  } catch (e) { return blank(); }
+}
+function valid(s) {
+  return s && typeof s === "object" && s.settings && Array.isArray(s.hens) && s.hens.length && s.days && typeof s.days === "object";
+}
+let S = load();
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
+  catch (e) { toast("Speichern fehlgeschlagen – bitte Backup erstellen!"); }
+}
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+
+/* ---------- Daten-Helfer ---------- */
+function hensOn(k) {
+  const h = S.hens.slice().sort((a, b) => a.from < b.from ? -1 : 1);
+  let n = h[0].n;
+  for (const e of h) if (e.from <= k) n = e.n;
+  return n;
+}
+function currentHens() { return hensOn(todayKey()); }
+function setHens(n) {
+  const t = todayKey();
+  S.hens = S.hens.filter(e => e.from !== t);
+  S.hens.push({ from: t, n });
+  S.hens.sort((a, b) => a.from < b.from ? -1 : 1);
+  // gleiche Anzahl hintereinander zusammenfassen
+  S.hens = S.hens.filter((e, i, arr) => i === 0 || arr[i - 1].n !== e.n);
+  save();
+}
+function dayRec(k) { return S.days[k] || { e: {}, n: "" }; }
+function dayTotal(k) { const r = S.days[k]; if (!r) return 0; let t = 0; for (const c in r.e) t += r.e[c] || 0; return t; }
+function putDay(k, rec) {
+  const empty = !rec.n && !Object.values(rec.e).some(v => v > 0);
+  if (empty) delete S.days[k]; else S.days[k] = rec;
+  save();
+}
+function firstKey() { const ks = Object.keys(S.days); return ks.length ? ks.sort()[0] : null; }
+
+/* ---------- Brut ---------- */
+const BROOD_DAYS = 21;
+const MILES = [
+  { d: 7,  t: "Erstes Schieren – unbefruchtete Eier aussortieren" },
+  { d: 18, t: "Zweites Schieren – danach Ruhe, nicht mehr stören" },
+  { d: 21, t: "Schlupf (Tag 20–22 ist normal)" },
+];
+const daysBetween = (a, b) => Math.round((parseKey(b) - parseKey(a)) / 864e5);
+const activeBroods = () => S.broods.filter(b => !b.end).sort((a, b) => a.start < b.start ? -1 : 1);
+function broodStatus(b) {
+  const day = daysBetween(b.start, todayKey()), left = BROOD_DAYS - day;
+  if (day === 7 || day === 18) return { day, now: true, txt: `Tag ${day}: heute schieren!` };
+  if (day >= 20 && day <= 22) return { day, now: true, txt: `Tag ${day}: Schlupf steht an!` };
+  if (day > 22) return { day, now: true, txt: `Tag ${day}: Schlupf überfällig – Eier prüfen` };
+  return { day, now: false, txt: `Tag ${day} von ${BROOD_DAYS} · Schlupf ca. ${fmtShort(addDays(b.start, BROOD_DAYS))} (noch ${left} ${left === 1 ? "Tag" : "Tage"})` };
+}
+
+/* Auswertung eines Zeitraums; fehlende Tage zählen als 0 Eier */
+function stats(from, to) {
+  const fk = firstKey(), tk = todayKey();
+  if (!fk) return null;
+  if (from < fk) from = fk;
+  if (to > tk) to = tk;
+  if (from > to) return null;
+  let eggs = 0, henDays = 0, days = 0, best = null, cols = {};
+  COLORS.forEach(c => cols[c.id] = 0);
+  for (let k = from; k <= to; k = addDays(k, 1)) {
+    const t = dayTotal(k);
+    eggs += t; henDays += hensOn(k); days++;
+    if (t > 0 && (!best || t > best.n)) best = { k, n: t };
+    const r = S.days[k];
+    if (r) for (const c in r.e) cols[c] = (cols[c] || 0) + (r.e[c] || 0);
+  }
+  return { eggs, days, henDays, best, cols, avg: eggs / days, rate: henDays ? eggs / henDays : 0 };
+}
+
+/* ---------- UI-Helfer ---------- */
+function eggSvg(hex, cls = "egg") {
+  return `<svg class="${cls}" viewBox="0 0 20 26" aria-hidden="true">
+    <path d="M10 1.2C4.6 1.2 1.2 9.6 1.2 15.6 1.2 21.4 5 24.8 10 24.8s8.8-3.4 8.8-9.2C18.8 9.6 15.4 1.2 10 1.2z" fill="${hex}" stroke="rgba(80,55,25,.38)" stroke-width="1"/>
+    <ellipse cx="7" cy="9" rx="2.2" ry="3.4" fill="#fff" opacity=".35" transform="rotate(-15 7 9)"/></svg>`;
+}
+let toastT;
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("on");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2200);
+}
+const buzz = () => { if (navigator.vibrate) navigator.vibrate(8); };
+function rampColor(n, hens) {
+  if (n <= 0) return null;
+  const r = n / Math.max(1, hens);
+  const i = r < .25 ? 0 : r < .5 ? 1 : r < .75 ? 2 : r < 1 ? 3 : 4;
+  return { bg: RAMP[i], dark: i >= 3 };
+}
+
+/* ---------- Zustand der Ansicht ---------- */
+const UI = { tab: "tag", day: todayKey(), month: null, year: new Date().getFullYear(), broodForm: false, endId: null };
+const view = document.getElementById("view");
+
+function renderHeader() {
+  document.getElementById("stallName").textContent = S.settings.name || "Hühnerbuch";
+  const h = currentHens();
+  document.getElementById("stallSub").textContent = `Sundheimer · ${h} ${h === 1 ? "Henne" : "Hennen"}`;
+  document.querySelectorAll("nav.tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === UI.tab));
+}
+function render() {
+  renderHeader();
+  ({ tag: renderDay, kalender: renderCal, statistik: renderStats, stall: renderStall })[UI.tab]();
+}
+function go(tab) { UI.tab = tab; render(); window.scrollTo(0, 0); }
+
+/* =================== EINTRAGEN =================== */
+function renderDay() {
+  const k = UI.day, t = todayKey();
+  if (k > t) UI.day = t;
+  const rec = dayRec(k), total = dayTotal(k), hens = hensOn(k);
+  const isToday = k === t, isYesterday = k === addDays(t, -1);
+  const label = isToday ? "Heute" : isYesterday ? "Gestern" : parseKey(k).toLocaleDateString("de-DE", { weekday: "long" });
+  const dateTxt = parseKey(k).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" });
+
+  const counters = COLORS.map(c => {
+    const v = rec.e[c.id] || 0;
+    return `<div class="counter">
+      ${eggSvg(c.hex)}
+      <div class="name">${c.name}${c.typical ? "<small>typisch Sundheimer</small>" : ""}</div>
+      <div class="stepper">
+        <button data-act="minus" data-c="${c.id}" aria-label="${c.name} weniger" ${v ? "" : "disabled"}>−</button>
+        <div class="val">${v}</div>
+        <button class="plus" data-act="plus" data-c="${c.id}" aria-label="${c.name} mehr">+</button>
+      </div></div>`;
+  }).join("");
+
+  // Backup-Erinnerung
+  const nDays = Object.keys(S.days).length;
+  const lb = S.settings.lastBackup;
+  const needBackup = nDays >= 10 && (!lb || (Date.now() - new Date(lb).getTime()) > 30 * 864e5);
+
+  // 7 Tage vs. Vorwoche
+  const w1 = sumRange(addDays(t, -6), t), w0 = sumRange(addDays(t, -13), addDays(t, -7));
+
+  const broodBanners = activeBroods().map(b => {
+    const st = broodStatus(b);
+    return `<div class="banner brood ${st.now ? "now" : ""}" data-act="gostall">🐣 <span><b>${esc(b.name || "Glucke")}</b> brütet · ${st.txt}</span></div>`;
+  }).join("");
+
+  view.innerHTML = `
+    ${broodBanners}
+    ${needBackup ? `<div class="banner" data-act="gostall">💾 <span>Schon länger kein Backup – kurz sichern, damit nichts verloren geht.</span></div>` : ""}
+    <div class="daynav">
+      <button class="iconbtn" data-act="prevday" aria-label="Vorheriger Tag">‹</button>
+      <div class="lbl"><b>${label}</b><span>${dateTxt}</span>${isToday ? "" : `<br><button class="todaylink" data-act="today">zurück zu heute</button>`}</div>
+      <button class="iconbtn" data-act="nextday" aria-label="Nächster Tag" ${isToday ? "disabled" : ""}>›</button>
+    </div>
+
+    <section class="card hero">
+      <div class="num">${total}</div>
+      <div>
+        <div class="what">${total === 1 ? "Ei" : "Eier"}</div>
+        <div class="meta">bei ${hens} ${hens === 1 ? "Henne" : "Hennen"}${total ? ` · ${fmtNum(100 * total / Math.max(1, hens))}&nbsp;% Legeleistung` : ""}</div>
+      </div>
+      ${nestSvg(total)}
+    </section>
+
+    <section class="card">
+      <h2 class="sec">Eier eintragen</h2>
+      ${counters}
+    </section>
+
+    <section class="card">
+      <div class="row"><label class="f" for="note">Notiz zum Tag</label><span class="spacer"></span><span class="saved" id="savedNote">✓ gespeichert</span></div>
+      <textarea id="note" placeholder="z. B. Mauser, Glucke, Windei, neues Futter …">${esc(rec.n || "")}</textarea>
+    </section>
+
+    <section class="card">
+      <h2 class="sec">Letzte 14 Tage</h2>
+      ${barChart14(t, k)}
+      <div class="hint" style="margin-top:6px">Letzte 7 Tage: <b style="color:var(--ink)">${w1} Eier</b> · Woche davor: ${w0} · Tippe auf einen Balken, um den Tag zu öffnen.</div>
+    </section>`;
+
+  const ta = document.getElementById("note");
+  let nt;
+  ta.addEventListener("input", () => {
+    const r = dayRec(UI.day); r.n = ta.value.trim() ? ta.value : "";
+    putDay(UI.day, { e: { ...r.e }, n: r.n });
+    clearTimeout(nt);
+    const s = document.getElementById("savedNote"); s.classList.add("on");
+    nt = setTimeout(() => s.classList.remove("on"), 1200);
+  });
+}
+function sumRange(a, b) { let s = 0; for (let k = a; k <= b; k = addDays(k, 1)) s += dayTotal(k); return s; }
+
+function nestSvg(n) {
+  // kleines Nest mit bis zu 7 sichtbaren Eiern
+  const shown = Math.min(n, 7);
+  const pos = [[46,30],[34,33],[58,33],[40,26],[52,25],[28,29],[64,29]];
+  let eggs = "";
+  for (let i = shown - 1; i >= 0; i--) {
+    const [x, y] = pos[i];
+    eggs += `<ellipse cx="${x}" cy="${y}" rx="7" ry="9" fill="#DDAE76" stroke="rgba(80,55,25,.35)"/>`;
+  }
+  return `<svg class="nest" viewBox="0 0 92 62" aria-hidden="true">
+    ${eggs}
+    <path d="M10 34 C14 52 30 58 46 58 C62 58 78 52 82 34 Z" fill="#C9A35F"/>
+    <path d="M10 34 C30 42 62 42 82 34" stroke="#A9823F" stroke-width="2" fill="none"/>
+    <g stroke="#A9823F" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".9">
+      <path d="M16 42 C30 47 50 48 74 41"/><path d="M22 50 C36 53 56 53 70 48"/>
+      <path d="M8 33 L18 37"/><path d="M84 33 L74 37"/><path d="M14 38 L22 44"/>
+    </g></svg>`;
+}
+
+function barChart14(endK, selK) {
+  const W = 340, H = 150, padL = 4, padR = 4, top = 18, base = 120;
+  const days = []; for (let i = 13; i >= 0; i--) days.push(addDays(endK, -i));
+  const vals = days.map(dayTotal);
+  const hens = currentHens();
+  const yMax = Math.max(hens, ...vals, 1);
+  const slot = (W - padL - padR) / 14, bw = Math.min(16, slot - 6);
+  const y = v => base - (base - top) * v / yMax;
+  let g = "";
+  // Referenzlinie: alle Hennen legen
+  const yr = y(hens);
+  g += `<line x1="${padL}" x2="${W - padR}" y1="${yr}" y2="${yr}" stroke="#C9BFA9" stroke-dasharray="3 4"/>`;
+  g += `<text x="${W - padR}" y="${yr - 5}" text-anchor="end" font-size="11" fill="#978C78">${hens} = jede Henne ein Ei</text>`;
+  g += `<line x1="${padL}" x2="${W - padR}" y1="${base}" y2="${base}" stroke="#D8CDB7"/>`;
+  days.forEach((k, i) => {
+    const v = vals[i], cx = padL + slot * i + slot / 2, sel = k === selK;
+    const h = base - y(v), x = cx - bw / 2, r = Math.min(4, h);
+    if (v > 0) g += `<path d="M${x} ${base} V${base - h + r} Q${x} ${base - h} ${x + r} ${base - h} H${x + bw - r} Q${x + bw} ${base - h} ${x + bw} ${base - h + r} V${base} Z" fill="${sel ? "#3F5536" : "#8FA67E"}"/>`;
+    if (sel) g += `<text x="${cx}" y="${base - h - 5}" text-anchor="middle" font-size="12" font-weight="700" fill="#2F2A20">${v}</text>`;
+    const wd = WD_S[parseKey(k).getDay()];
+    g += `<text x="${cx}" y="${base + 15}" text-anchor="middle" font-size="10.5" fill="${sel ? "#2F2A20" : "#978C78"}" font-weight="${sel ? 700 : 400}">${wd}</text>`;
+    g += `<text x="${cx}" y="${base + 27}" text-anchor="middle" font-size="9.5" fill="#B0A690">${parseKey(k).getDate()}.</text>`;
+    g += `<rect x="${padL + slot * i}" y="0" width="${slot}" height="${H}" fill="transparent" data-act="pickday" data-k="${k}"/>`;
+  });
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Eier pro Tag, letzte 14 Tage">${g}</svg>`;
+}
+
+/* =================== KALENDER =================== */
+function renderCal() {
+  if (!UI.month) { const d = parseKey(UI.day); UI.month = [d.getFullYear(), d.getMonth()]; }
+  const [Y, M] = UI.month, t = todayKey();
+  const first = new Date(Y, M, 1), dim = new Date(Y, M + 1, 0).getDate();
+  const lead = (first.getDay() + 6) % 7; // Montag zuerst
+  let cells = ["Mo","Di","Mi","Do","Fr","Sa","So"].map(w => `<div class="wd">${w}</div>`).join("");
+  for (let i = 0; i < lead; i++) cells += `<div class="d blank"></div>`;
+  for (let d = 1; d <= dim; d++) {
+    const k = keyOf(new Date(Y, M, d)), n = dayTotal(k), fut = k > t;
+    const col = rampColor(n, hensOn(k)), note = S.days[k] && S.days[k].n;
+    cells += `<button class="d ${fut ? "future" : ""} ${k === t ? "today" : ""} ${col && col.dark ? "dark" : ""}"
+      style="${col ? `background:${col.bg};border-color:transparent` : ""}" ${fut ? "disabled" : `data-act="openday" data-k="${k}"`}
+      aria-label="${fmtLong(k)}: ${n} Eier${note ? ", mit Notiz" : ""}">
+      <span class="n">${d}</span>${note ? `<span class="dot"></span>` : ""}<span class="c">${n || (fut ? "" : "·")}</span></button>`;
+  }
+  const from = keyOf(first), to = keyOf(new Date(Y, M, dim));
+  const st = stats(from, to);
+  const isNow = Y === new Date().getFullYear() && M === new Date().getMonth();
+
+  // Notizen des Monats
+  const notes = Object.keys(S.days).filter(k => k >= from && k <= to && S.days[k].n).sort().reverse();
+
+  view.innerHTML = `
+    <section class="card">
+      <div class="monthnav">
+        <button class="iconbtn" data-act="prevmonth" aria-label="Vorheriger Monat">‹</button>
+        <b>${MONTHS[M]} ${Y}</b>
+        <button class="iconbtn" data-act="nextmonth" aria-label="Nächster Monat" ${isNow ? "disabled" : ""}>›</button>
+      </div>
+      <div class="cal">${cells}</div>
+      <div class="legend">wenige <i style="background:${RAMP[0]}"></i><i style="background:${RAMP[1]}"></i><i style="background:${RAMP[2]}"></i><i style="background:${RAMP[3]}"></i><i style="background:${RAMP[4]}"></i> alle Hennen gelegt</div>
+    </section>
+    <section class="card">
+      ${st ? `<div class="tiles">
+        <div class="tile"><div class="v">${fmtNum(st.eggs)}</div><div class="k">Eier im ${MONTHS[M]}</div></div>
+        <div class="tile"><div class="v">${fmtNum(st.avg, 1)}</div><div class="k">Ø Eier pro Tag</div></div>
+        <div class="tile"><div class="v">${fmtNum(st.rate * 100)}&nbsp;%</div><div class="k">Legeleistung</div></div>
+        <div class="tile"><div class="v">${st.best ? st.best.n : "–"}</div><div class="k">${st.best ? "Bester Tag: " + parseKey(st.best.k).getDate() + ". " : "Bester Tag"}</div></div>
+      </div>` : `<div class="empty">Für diesen Monat gibt es noch keine Einträge.</div>`}
+    </section>
+    ${notes.length ? `<section class="card notes"><h2 class="sec">Notizen</h2>${notes.map(k =>
+      `<div class="nt" data-act="openday" data-k="${k}"><small>${fmtShort(k)} · ${dayTotal(k)} Eier</small>${esc(S.days[k].n)}</div>`).join("")}</section>` : ""}`;
+}
+
+/* =================== STATISTIK =================== */
+function renderStats() {
+  const Y = UI.year, nowY = new Date().getFullYear();
+  const fk = firstKey();
+  if (!fk) { view.innerHTML = `<section class="card empty">Noch keine Eier eingetragen.<br>Sobald du ein paar Tage erfasst hast, siehst du hier deine Auswertung.</section>`; return; }
+  const minY = parseKey(fk).getFullYear();
+  const st = stats(`${Y}-01-01`, `${Y}-12-31`);
+  const all = stats(fk, todayKey());
+
+  // Monatswerte
+  const months = [];
+  for (let m = 0; m < 12; m++) {
+    const from = keyOf(new Date(Y, m, 1)), to = keyOf(new Date(Y, m + 1, 0));
+    months.push({ m, s: stats(from, to) });
+  }
+
+  const colTotal = st ? COLORS.reduce((a, c) => a + (st.cols[c.id] || 0), 0) : 0;
+  const colBlock = st && colTotal ? `
+    <div class="stack">${COLORS.filter(c => st.cols[c.id]).map(c => `<span style="flex:${st.cols[c.id]};background:${c.hex}"></span>`).join("")}</div>
+    ${COLORS.map(c => {
+      const n = st.cols[c.id] || 0;
+      return `<div class="colrow">${eggSvg(c.hex)}<span class="nm">${c.name}</span><span class="ct">${fmtNum(n)} · ${fmtNum(100 * n / colTotal)}&nbsp;%</span></div>`;
+    }).join("")}` : `<div class="hint">Keine Daten.</div>`;
+
+  view.innerHTML = `
+    <div class="monthnav" style="margin-top:4px">
+      <button class="iconbtn" data-act="prevyear" ${Y <= minY ? "disabled" : ""} aria-label="Vorheriges Jahr">‹</button>
+      <b>${Y}</b>
+      <button class="iconbtn" data-act="nextyear" ${Y >= nowY ? "disabled" : ""} aria-label="Nächstes Jahr">›</button>
+    </div>
+    ${st ? `<section class="card"><div class="tiles">
+      <div class="tile"><div class="v">${fmtNum(st.eggs)}</div><div class="k">Eier ${Y}</div></div>
+      <div class="tile"><div class="v">${fmtNum(st.avg, 1)}</div><div class="k">Ø Eier pro Tag</div></div>
+      <div class="tile"><div class="v">${fmtNum(st.rate * 100)}&nbsp;%</div><div class="k">Legeleistung</div></div>
+      <div class="tile"><div class="v">${fmtNum(st.henDays ? st.eggs / st.henDays * 365 : 0)}</div><div class="k">Eier pro Henne &amp; Jahr (hochgerechnet)</div></div>
+    </div>
+    ${st.best ? `<div class="hint" style="margin-top:10px">Bester Tag: <b style="color:var(--ink)">${st.best.n} Eier</b> am ${fmtLong(st.best.k)}</div>` : ""}
+    </section>` : `<section class="card empty">Für ${Y} gibt es keine Einträge.</section>`}
+
+    <section class="card">
+      <h2 class="sec">Eier pro Monat</h2>
+      <div class="readout" id="mReadout"></div>
+      ${monthChart(months)}
+    </section>
+
+    <section class="card">
+      <h2 class="sec">Eierfarben ${Y}</h2>
+      ${colBlock}
+    </section>
+
+    <section class="card">
+      <h2 class="sec">Seit Beginn</h2>
+      <div class="hint">Erster Eintrag am ${fmtLong(fk)}</div>
+      <div class="tiles" style="margin-top:10px">
+        <div class="tile"><div class="v">${fmtNum(all.eggs)}</div><div class="k">Eier insgesamt</div></div>
+        <div class="tile"><div class="v">${fmtNum(all.eggs / 10, 1)}</div><div class="k">Zehnerpackungen</div></div>
+      </div>
+    </section>`;
+  const nowM = Y === nowY ? new Date().getMonth() : 11;
+  showMonth(months, months[nowM].s ? nowM : months.findIndex(x => x.s));
+}
+let _months = null;
+function monthChart(months) {
+  _months = months;
+  const W = 340, H = 140, base = 112, top = 10, padL = 4, padR = 4;
+  const vals = months.map(x => x.s ? x.s.eggs : 0);
+  const max = Math.max(...vals, 1);
+  const slot = (W - padL - padR) / 12, bw = Math.min(18, slot - 6);
+  let g = `<line x1="${padL}" x2="${W - padR}" y1="${base}" y2="${base}" stroke="#D8CDB7"/>`;
+  months.forEach((x, i) => {
+    const v = vals[i], cx = padL + slot * i + slot / 2;
+    const h = (base - top) * v / max, xx = cx - bw / 2, r = Math.min(4, h);
+    if (v > 0) g += `<path id="mb${i}" d="M${xx} ${base} V${base - h + r} Q${xx} ${base - h} ${xx + r} ${base - h} H${xx + bw - r} Q${xx + bw} ${base - h} ${xx + bw} ${base - h + r} V${base} Z" fill="#8FA67E"/>`;
+    g += `<text x="${cx}" y="${base + 16}" text-anchor="middle" font-size="11" fill="#978C78">${MONTHS_S[i]}</text>`;
+    g += `<rect x="${padL + slot * i}" y="0" width="${slot}" height="${H}" fill="transparent" data-act="pickmonth" data-m="${i}"/>`;
+  });
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Eier pro Monat">${g}</svg>`;
+}
+function showMonth(months, i) {
+  const el = document.getElementById("mReadout");
+  if (!el) return;
+  months.forEach((_, j) => { const b = document.getElementById("mb" + j); if (b) b.setAttribute("fill", j === i ? "#3F5536" : "#8FA67E"); });
+  const s = i >= 0 && months[i].s;
+  el.innerHTML = s ? `<b>${MONTHS[i]}:</b> ${fmtNum(s.eggs)} Eier · Ø ${fmtNum(s.avg, 1)} pro Tag · ${fmtNum(s.rate * 100)}&nbsp;%`
+                   : `Tippe auf einen Monat für Details.`;
+}
+
+function broodSection() {
+  const t = todayKey(), act = activeBroods();
+  const past = S.broods.filter(b => b.end).sort((a, b) => a.start < b.start ? 1 : -1);
+  const cards = act.map(b => {
+    const st = broodStatus(b), day = st.day;
+    const pct = Math.max(0, Math.min(100, day / BROOD_DAYS * 100));
+    const miles = MILES.map(m => {
+      const cls = day > m.d ? "done" : day === m.d ? "today" : "";
+      return `<li class="${cls}"><span class="ck">${day > m.d ? "✓" : day === m.d ? "●" : "○"}</span><span>${fmtShort(addDays(b.start, m.d))} · Tag ${m.d}: ${m.t}</span></li>`;
+    }).join("");
+    const ending = UI.endId === b.id;
+    return `<div class="brood">
+      <div class="title"><b>${esc(b.name || "Glucke")}</b><span class="hint">${b.eggs ? b.eggs + " Eier · " : ""}seit ${fmtShort(b.start)}</span></div>
+      <div class="progress"><span style="width:${pct}%"></span><i style="left:${7 / BROOD_DAYS * 100}%"></i><i style="left:${18 / BROOD_DAYS * 100}%"></i></div>
+      <div class="hint">${st.txt}</div>
+      <ul class="miles">${miles}</ul>
+      ${ending ? `<label class="f" for="chicks">Wie viele Küken sind geschlüpft?</label>
+        <input type="number" id="chicks" min="0" inputmode="numeric" placeholder="Anzahl">
+        <div class="btnrow"><button class="btn small" data-act="brood-cancel">Abbrechen</button><button class="btn small primary" data-act="brood-finish" data-id="${b.id}">Abschließen</button></div>`
+      : `<div class="btnrow"><button class="btn small" data-act="brood-end" data-id="${b.id}">Brut beenden</button></div>
+         <button class="linkbtn" data-act="brood-del" data-id="${b.id}">versehentlich angelegt? löschen</button>`}
+    </div>`;
+  }).join("");
+  const form = UI.broodForm ? `<div class="brood">
+      <div class="form-grid">
+        <div><label class="f" for="bName">Glucke</label><input type="text" id="bName" placeholder="z. B. Berta" maxlength="30"></div>
+        <div><label class="f" for="bEggs">Eier unter ihr</label><input type="number" id="bEggs" min="1" inputmode="numeric" placeholder="z. B. 8"></div>
+      </div>
+      <label class="f" for="bStart" style="margin-top:10px">Brutbeginn</label>
+      <input type="date" id="bStart" value="${t}" max="${t}">
+      <div class="btnrow"><button class="btn small" data-act="brood-cancel">Abbrechen</button><button class="btn small primary" data-act="brood-save">Brut starten</button></div>
+    </div>` : `<button class="btn" data-act="brood-new">+ Neue Brut eintragen</button>`;
+  const hist = past.length ? `<div style="margin-top:16px"><b style="font-size:14px">Frühere Bruten</b>${past.map(b =>
+    `<div class="past"><span>${esc(b.name || "Glucke")} · ${parseKey(b.start).toLocaleDateString("de-DE")} · ${b.eggs ? b.eggs + " Eier → " : ""}${b.chicks == null ? "?" : b.chicks} Küken</span><button class="linkbtn" data-act="brood-del" data-id="${b.id}">löschen</button></div>`).join("")}</div>` : "";
+  return `<section class="card"><h2 class="sec">Brutkalender</h2>
+    ${act.length || UI.broodForm ? "" : `<div class="hint">Wenn eine Glucke brütet, hier eintragen. Die App zählt die 21 Tage mit und zeigt, wann geschiert wird.</div>`}
+    ${cards}${form}${hist}</section>`;
+}
+
+/* =================== STALL / EINSTELLUNGEN =================== */
+function renderStall() {
+  const h = currentHens(), lb = S.settings.lastBackup;
+  const nDays = Object.keys(S.days).length;
+  view.innerHTML = `
+    ${broodSection()}
+    <section class="card">
+      <h2 class="sec">Mein Stall</h2>
+      <label class="f" for="nameIn">Name</label>
+      <input type="text" id="nameIn" value="${esc(S.settings.name || "")}" maxlength="40">
+      <hr class="soft">
+      <div class="row">
+        <div style="flex:1"><b>Hennen im Stall</b><div class="hint">Gilt ab heute – frühere Tage behalten ihre Anzahl.</div></div>
+        <div class="stepper">
+          <button data-act="hensminus" ${h <= 1 ? "disabled" : ""} aria-label="Eine Henne weniger">−</button>
+          <div class="val">${h}</div>
+          <button class="plus" data-act="hensplus" aria-label="Eine Henne mehr">+</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="sec">Datensicherung</h2>
+      <div class="hint">Alle Daten liegen nur auf diesem Handy (${nDays} ${nDays === 1 ? "Tag" : "Tage"} erfasst).
+        Letztes Backup: <b style="color:var(--ink)">${lb ? new Date(lb).toLocaleDateString("de-DE") : "noch nie"}</b>.
+        Ein Backup kannst du z. B. per WhatsApp oder Mail an dich selbst schicken.</div>
+      <button class="btn primary" data-act="share">Backup teilen / verschicken</button>
+      <button class="btn" data-act="download">Backup als Datei speichern</button>
+      <button class="btn" data-act="csv">Als Tabelle exportieren (Excel)</button>
+      <button class="btn" data-act="import">Backup wiederherstellen</button>
+    </section>
+
+    <section class="card">
+      <h2 class="sec">Über</h2>
+      <div class="hint">Hühnerbuch für Sundheimer. Funktioniert komplett ohne Internet – nichts verlässt dieses Handy, außer du verschickst selbst ein Backup.</div>
+      <button class="btn danger" data-act="wipe">Alle Daten löschen</button>
+    </section>`;
+  const ni = document.getElementById("nameIn");
+  ni.addEventListener("input", () => { S.settings.name = ni.value; save(); renderHeader(); });
+}
+
+/* ---------- Backup ---------- */
+function backupFile() {
+  const name = `huehnerbuch-backup-${todayKey()}.json`;
+  return new File([JSON.stringify(S, null, 1)], name, { type: "application/json" });
+}
+function markBackup() { S.settings.lastBackup = new Date().toISOString(); save(); }
+function download(file) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(file); a.download = file.name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+async function shareBackup() {
+  const f = backupFile();
+  if (navigator.canShare && navigator.canShare({ files: [f] })) {
+    try { await navigator.share({ files: [f], title: "Hühnerbuch Backup" }); markBackup(); toast("Backup verschickt ✓"); render(); }
+    catch (e) { if (e.name !== "AbortError") { download(f); markBackup(); toast("Backup gespeichert ✓"); render(); } }
+  } else { download(f); markBackup(); toast("Backup in „Downloads“ gespeichert ✓"); render(); }
+}
+function exportCsv() {
+  const ks = Object.keys(S.days).sort();
+  const q = s => `"${String(s).replace(/"/g, '""')}"`;
+  let out = ["Datum", "Eier gesamt", ...COLORS.map(c => c.name), "Hennen", "Notiz"].join(";") + "\r\n";
+  ks.forEach(k => {
+    const r = S.days[k];
+    out += [parseKey(k).toLocaleDateString("de-DE"), dayTotal(k), ...COLORS.map(c => r.e[c.id] || 0), hensOn(k), q(r.n || "")].join(";") + "\r\n";
+  });
+  download(new File(["﻿" + out], `huehnerbuch-${todayKey()}.csv`, { type: "text/csv" }));
+  toast("Tabelle gespeichert ✓");
+}
+document.getElementById("importFile").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!valid(data)) throw new Error("ungültig");
+    const n = Object.keys(data.days).length;
+    if (!confirm(`Backup mit ${n} erfassten Tagen laden?\nDie aktuellen Daten auf diesem Handy werden dadurch ersetzt.`)) return;
+    S = normalize(data); S.settings.welcomed = true; save(); toast("Backup wiederhergestellt ✓"); render();
+  } catch (err) { alert("Diese Datei ist kein gültiges Hühnerbuch-Backup."); }
+});
+
+/* ---------- Klicks ---------- */
+document.addEventListener("click", e => {
+  const tabBtn = e.target.closest("[data-tab]");
+  if (tabBtn) { if (tabBtn.dataset.tab === "kalender") UI.month = null; go(tabBtn.dataset.tab); return; }
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const act = el.dataset.act;
+  switch (act) {
+    case "plus": case "minus": {
+      const r = dayRec(UI.day), c = el.dataset.c, e2 = { ...r.e };
+      e2[c] = Math.max(0, (e2[c] || 0) + (act === "plus" ? 1 : -1));
+      if (!e2[c]) delete e2[c];
+      putDay(UI.day, { e: e2, n: r.n || "" }); buzz(); render(); break;
+    }
+    case "prevday": UI.day = addDays(UI.day, -1); render(); break;
+    case "nextday": UI.day = addDays(UI.day, 1); render(); break;
+    case "today": UI.day = todayKey(); render(); break;
+    case "pickday": UI.day = el.dataset.k; render(); break;
+    case "openday": UI.day = el.dataset.k; go("tag"); break;
+    case "prevmonth": case "nextmonth": {
+      let [Y, M] = UI.month; M += act === "nextmonth" ? 1 : -1;
+      if (M < 0) { M = 11; Y--; } if (M > 11) { M = 0; Y++; }
+      UI.month = [Y, M]; render(); break;
+    }
+    case "prevyear": UI.year--; render(); break;
+    case "nextyear": UI.year++; render(); break;
+    case "pickmonth": showMonth(_months, +el.dataset.m); break;
+    case "hensplus": setHens(currentHens() + 1); render(); break;
+    case "hensminus": setHens(Math.max(1, currentHens() - 1)); render(); break;
+    case "gostall": go("stall"); break;
+    case "brood-new": UI.broodForm = true; UI.endId = null; render(); document.getElementById("bName").focus(); break;
+    case "brood-cancel": UI.broodForm = false; UI.endId = null; render(); break;
+    case "brood-save": {
+      const start = document.getElementById("bStart").value, t = todayKey();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || start > t) { toast("Bitte ein gültiges Datum wählen"); break; }
+      const eggs = parseInt(document.getElementById("bEggs").value, 10);
+      S.broods.push({ id: Date.now().toString(36), name: document.getElementById("bName").value.trim(),
+                      eggs: eggs > 0 ? eggs : null, start, end: null, chicks: null });
+      save(); UI.broodForm = false; render(); toast("Brut eingetragen 🐣"); break;
+    }
+    case "brood-end": UI.endId = el.dataset.id; UI.broodForm = false; render(); document.getElementById("chicks").focus(); break;
+    case "brood-finish": {
+      const b = S.broods.find(x => x.id === el.dataset.id); if (!b) break;
+      const n = parseInt(document.getElementById("chicks").value, 10);
+      b.chicks = n >= 0 ? n : null; b.end = todayKey(); save(); UI.endId = null; render();
+      toast(b.chicks != null ? `Brut abgeschlossen – ${b.chicks} Küken 🐣` : "Brut abgeschlossen"); break;
+    }
+    case "brood-del":
+      if (confirm("Diese Brut wirklich löschen?")) { S.broods = S.broods.filter(x => x.id !== el.dataset.id); save(); render(); }
+      break;
+    case "share": shareBackup(); break;
+    case "download": download(backupFile()); markBackup(); toast("Backup in „Downloads“ gespeichert ✓"); render(); break;
+    case "csv": exportCsv(); break;
+    case "import": document.getElementById("importFile").click(); break;
+    case "wipe":
+      if (confirm("Wirklich ALLE Einträge löschen? Das kann nicht rückgängig gemacht werden.") &&
+          confirm("Ganz sicher? Ohne Backup sind die Daten weg.")) {
+        const name = S.settings.name; S = blank(); S.settings.welcomed = true; S.settings.name = name; save();
+        toast("Alle Daten gelöscht"); render();
+      }
+      break;
+  }
+});
+
+/* ---------- Erster Start ---------- */
+function welcome() {
+  const ov = document.createElement("div");
+  ov.className = "overlay";
+  let n = currentHens();
+  ov.innerHTML = `<div class="welcome">
+    <svg class="hen" viewBox="0 0 120 100" aria-hidden="true"><use href="#hen"/></svg>
+    <h1>${esc(GREETING_TITLE)}</h1>
+    <p>${esc(GREETING_TEXT)}</p>
+    <b>Wie viele Hennen hast du?</b>
+    <div class="stepper">
+      <button id="wMinus" aria-label="weniger">−</button><div class="val" id="wVal">${n}</div><button class="plus" id="wPlus" aria-label="mehr">+</button>
+    </div>
+    <button class="btn primary" id="wGo">Los geht's</button>
+  </div>`;
+  document.body.appendChild(ov);
+  const upd = () => { ov.querySelector("#wVal").textContent = n; ov.querySelector("#wMinus").disabled = n <= 1; };
+  ov.querySelector("#wMinus").onclick = () => { n = Math.max(1, n - 1); upd(); };
+  ov.querySelector("#wPlus").onclick = () => { n++; upd(); };
+  ov.querySelector("#wGo").onclick = () => {
+    S.hens = [{ from: todayKey(), n }]; S.settings.welcomed = true; save(); ov.remove(); render();
+  };
+  upd();
+}
+
+/* ---------- Schnelleintrag (langes Drücken aufs App-Symbol) ---------- */
+function handleShortcut() {
+  const c = new URLSearchParams(location.search).get("add");
+  if (!c) return;
+  history.replaceState(null, "", location.pathname); // damit ein Neuladen nicht doppelt zählt
+  const col = COLORS.find(x => x.id === c);
+  if (!col || !S.settings.welcomed) return;
+  const t = todayKey(), r = dayRec(t), e = { ...r.e };
+  e[c] = (e[c] || 0) + 1;
+  putDay(t, { e, n: r.n || "" });
+  UI.day = t; UI.tab = "tag"; render(); buzz();
+  const n = dayTotal(t);
+  toast(`+1 ${col.name} eingetragen · heute ${n} ${n === 1 ? "Ei" : "Eier"}`);
+}
+
+/* ---------- Start ---------- */
+render();
+if (!S.settings.welcomed) welcome();
+handleShortcut();
+// Wenn die App über Nacht offen bleibt: beim Zurückkehren auf "heute" springen
+let lastToday = todayKey();
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && todayKey() !== lastToday) {
+    if (UI.day === lastToday) UI.day = todayKey();
+    lastToday = todayKey(); render();
+  }
+});
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
